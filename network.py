@@ -1,5 +1,9 @@
 import socket
 import struct
+from enum import Enum
+import json
+
+TransactionValidationError = Enum('TransactionValidationError', ['INVALID_JSON', 'INVALID_SENDER', 'INVALID_MESSAGE', 'INVALID_SIGNATURE', 'INVALID_NONCE'])
 
 def recv_exact(sock: socket.socket, msglen):
 	chunks = []
@@ -37,3 +41,11 @@ def send_prefixed(sock: socket.socket, msg: bytes):
 		raise RuntimeError("message too large")
 	size_bytes = struct.pack("!H", size)
 	send_exact(sock, size_bytes + msg)
+
+def validate_transaction(transaction: str)  -> dict | TransactionValidationError:
+	try:
+		tx = json.loads(transaction)
+	except json.JSONDecodeError:
+		return TransactionValidationError.INVALID_JSON
+	
+	pass
