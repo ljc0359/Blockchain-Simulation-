@@ -1,0 +1,16 @@
+Listening on 127.0.0.1:8890
+Connected by the client 127.0.0.1: 58411
+I am trying to connect to peer 127.0.0.1:8888
+I am trying to connect to peer 127.0.0.1:8889
+I am trying to connect to peer 127.0.0.1:8890
+I've connected to the peer 127.0.0.1:8888
+I've connected to the peer 127.0.0.1:8889
+Connected by the client 127.0.0.1: 58414
+I've connected to the peer 127.0.0.1:8890
+Connected by the client 127.0.0.1: 58417
+Processing a test request
+Received a response from 127.0.0.1:8889 : Hi
+Processing a test request
+Received a response from 127.0.0.1:8888 : Hi
+Received a response from 127.0.0.1:8890 : Hi
+Processing a test request
