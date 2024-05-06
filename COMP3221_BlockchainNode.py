@@ -119,6 +119,7 @@ class HandlingTransactionRequest(HandlingRequest):
         
         if not error:
             self.ctx.transaction_pool.append(tx)
+            print(f"[MEM] Stored transaction in the transaction pool: {tx["signature"]}")
             self.reply({"response": "True"})
         else:
             self.reply({"response": "False"})
@@ -389,10 +390,10 @@ def main():
 
     private_key, public_key = generate_key_pair()
     hex_string = binascii.hexlify(public_key.public_bytes_raw()).decode('ascii')
-    signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 10}))
+    signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 0}))
     # Broadcast a test message
     
-    payload_ = {"sender": hex_string, "message": "hello", "nonce": 10, "signature": signature}
+    payload_ = {"sender": hex_string, "message": "hello", "nonce": 0, "signature": signature}
     """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
     ctx.broadcast_request(Request(
          type="transaction", 

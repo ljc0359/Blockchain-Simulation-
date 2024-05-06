@@ -1,1 +1,19 @@
 Listening on 127.0.0.1:8888
+I am trying to connect to peer 127.0.0.1:8888
+Connected by the client 127.0.0.1: 61151
+I am trying to connect to peer 127.0.0.1:8889
+I've connected to the peer 127.0.0.1:8888
+I've connected to the peer 127.0.0.1:8889
+I am trying to connect to peer 127.0.0.1:8890
+Connected by the client 127.0.0.1: 61152
+I've connected to the peer 127.0.0.1:8890
+Connected by the client 127.0.0.1: 61157
+Received a transaction from node 127.0.0.1: {'sender': '3e68c6741e886f6b9082913436b2c4f39a64310e1c4a911ca36b191608cb9428', 'message': 'hello', 'nonce': 0, 'signature': '95f232812fd29ffe7d2728719131c9f18ab58c0d8d6022f64041e47f12c6e33df8384848110a08d64b79b0594b7522c32765b02c35956fc218c8946c168dfa0a'}
+[MEM] Stored transaction in the transaction pool: 95f232812fd29ffe7d2728719131c9f18ab58c0d8d6022f64041e47f12c6e33df8384848110a08d64b79b0594b7522c32765b02c35956fc218c8946c168dfa0a
+Received a transaction from node 127.0.0.1: {'sender': '50c7958bddf0a7d83f52daee02cd28e6f1bed075cbef1a9a2473c61e91319eed', 'message': 'hello', 'nonce': 0, 'signature': 'fccb65bb554696197d8b0517f1126aac472bcbd7fdb847ecb649627e83622d884dc41dafa15f699266aef6f64f9d7c31a04a6ae73495c1af16bcd62421f4e608'}
+[MEM] Stored transaction in the transaction pool: fccb65bb554696197d8b0517f1126aac472bcbd7fdb847ecb649627e83622d884dc41dafa15f699266aef6f64f9d7c31a04a6ae73495c1af16bcd62421f4e608
+Received a response from 127.0.0.1:8889 : True
+Received a response from 127.0.0.1:8888 : True
+Received a transaction from node 127.0.0.1: {'sender': '18cec170ccc41693e2d1de6d94d98db886218d22673b8b800def884812269331', 'message': 'hello', 'nonce': 0, 'signature': '6e54f6ad621e0c5867d8ec48610a40e12a7fedd1e3ee6744bdd2aa64db7f2870ad58c662c720e08af8d10398b9485476c52108759ec08d80a1104ad323d25b0e'}
+[MEM] Stored transaction in the transaction pool: 6e54f6ad621e0c5867d8ec48610a40e12a7fedd1e3ee6744bdd2aa64db7f2870ad58c662c720e08af8d10398b9485476c52108759ec08d80a1104ad323d25b0e
+Received a response from 127.0.0.1:8890 : True

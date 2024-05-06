@@ -1,19 +1,1 @@
 Listening on 127.0.0.1:8890
-Connected by the client 127.0.0.1: 61053
-I am trying to connect to peer 127.0.0.1:8888
-I've connected to the peer 127.0.0.1:8888
-I am trying to connect to peer 127.0.0.1:8889
-I've connected to the peer 127.0.0.1:8889
-I am trying to connect to peer 127.0.0.1:8890
-I've connected to the peer 127.0.0.1:8890
-Connected by the client 127.0.0.1: 61056
-Connected by the client 127.0.0.1: 61058
-Received a transaction from node 127.0.0.1: {'sender': '07cfdbfc62d347e9329af70d9e2df50043ae77582c1b20db85e5b19c36184b50', 'message': 'hello', 'nonce': 10, 'signature': '2fe402a5a44edae9093b966148400b9deecf37e092bf21c12944e9d2164439ed2f666ac3e2b565220acc7d7dd653f9234fac0e33d73a849ac941ef8dda746509'}
-[TX] Received an invalid transaction, wrong nonce - {'sender': '07cfdbfc62d347e9329af70d9e2df50043ae77582c1b20db85e5b19c36184b50', 'message': 'hello', 'nonce': 10, 'signature': '2fe402a5a44edae9093b966148400b9deecf37e092bf21c12944e9d2164439ed2f666ac3e2b565220acc7d7dd653f9234fac0e33d73a849ac941ef8dda746509'}
-Received a transaction from node 127.0.0.1: {'sender': 'eb713dac703499b469fc84acd236e2b6fa97434a0f8dc02b309d763635690a00', 'message': 'hello', 'nonce': 10, 'signature': '05c1109e0ee20df000639daa61eb61f8b4b586d2ae9f640b3e2828ebb0c398b4658257e3017ed307ffbea394e83963474e1bda82c6101e58e4272d597daf8100'}
-[TX] Received an invalid transaction, wrong nonce - {'sender': 'eb713dac703499b469fc84acd236e2b6fa97434a0f8dc02b309d763635690a00', 'message': 'hello', 'nonce': 10, 'signature': '05c1109e0ee20df000639daa61eb61f8b4b586d2ae9f640b3e2828ebb0c398b4658257e3017ed307ffbea394e83963474e1bda82c6101e58e4272d597daf8100'}
-Received a response from 127.0.0.1:8890 : False
-Received a response from 127.0.0.1:8888 : False
-Received a transaction from node 127.0.0.1: {'sender': '0a39697b7596c7ff0e9f77432aa930c471d8582af30c8f6351ed9af7b29b223d', 'message': 'hello', 'nonce': 10, 'signature': 'caf9807372ab551f2331a2ff562c35a4a98e925e5bcfb80e12009c60790ba794a3a2dd65422fa91e0bea4a20b50accf9ec1bfa32f39cc3903be43c5298739909'}
-[TX] Received an invalid transaction, wrong nonce - {'sender': '0a39697b7596c7ff0e9f77432aa930c471d8582af30c8f6351ed9af7b29b223d', 'message': 'hello', 'nonce': 10, 'signature': 'caf9807372ab551f2331a2ff562c35a4a98e925e5bcfb80e12009c60790ba794a3a2dd65422fa91e0bea4a20b50accf9ec1bfa32f39cc3903be43c5298739909'}
-Received a response from 127.0.0.1:8889 : False
