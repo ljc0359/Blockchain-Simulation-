@@ -2,8 +2,12 @@ import socket
 import struct
 from enum import Enum
 import json
+import cryptography.hazmat.primitives.asymmetric.ed25519 as ed25519
+import re
+from cryptography.exceptions import InvalidSignature
 
 TransactionValidationError = Enum('TransactionValidationError', ['INVALID_JSON', 'INVALID_SENDER', 'INVALID_MESSAGE', 'INVALID_SIGNATURE', 'INVALID_NONCE'])
+sender_valid = re.compile('^[a-fA-F0-9]{64}$')
 
 def recv_exact(sock: socket.socket, msglen):
 	chunks = []
@@ -42,10 +46,31 @@ def send_prefixed(sock: socket.socket, msg: bytes):
 	size_bytes = struct.pack("!H", size)
 	send_exact(sock, size_bytes + msg)
 
-def validate_transaction(transaction: str)  -> dict | TransactionValidationError:
+def transaction_bytes(transaction: dict) -> bytes:
+	return json.dumps({'sender': transaction['sender'], 'message': transaction['message']}, sort_keys=True).encode()
+
+def make_transaction(sender, message, signature) -> str:
+	return json.dumps({'sender': sender, 'message': message, 'signature': signature})
+
+def transaction_bytes(transaction: dict) -> bytes:
+	return json.dumps({'sender': transaction['sender'], 'message': transaction['message'], 'nonce': transaction['nonce']}, sort_keys=True).encode()
+
+def validate_transaction(transaction: str, nonce) -> dict | TransactionValidationError:
+	tx = transaction
+
+	if not(tx.get('sender') and isinstance(tx['sender'], str) and sender_valid.search(tx['sender'])):
+		return TransactionValidationError.INVALID_SENDER
+
+	if not(tx.get('message') and isinstance(tx['message'], str) and len(tx['message']) <= 70 and tx['message'].isalnum()):
+		return TransactionValidationError.INVALID_MESSAGE
+
+	public_key = ed25519.Ed25519PublicKey.from_public_bytes(bytes.fromhex(tx['sender']))
 	try:
-		tx = json.loads(transaction)
-	except json.JSONDecodeError:
-		return TransactionValidationError.INVALID_JSON
+		public_key.verify(bytes.fromhex(tx['signature']), transaction_bytes(tx))
+	except InvalidSignature:
+		return TransactionValidationError.INVALID_SIGNATURE
 	
-	pass
+	if "nonce" not in tx or tx["nonce"] > nonce:
+		return TransactionValidationError.INVALID_NONCE
+	
+	return tx

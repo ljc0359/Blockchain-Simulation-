@@ -10,6 +10,9 @@ import threading
 import time
 from types import NoneType
 from typing import Any, Callable, Dict, Tuple, Type
+import network
+from security import generate_key_pair, generate_block_hash, make_signature
+import binascii
 
 WORKER_COUNT = 8
 
@@ -23,6 +26,8 @@ class AppContext:
     request_handler_register: RequestHandlerRegister
     peer_register: PeerRegister
     task_queue: TaskQueue
+    transaction_pool: list
+
 
     def __init__(self, port):
         self.request_handler_register = {}
@@ -30,6 +35,7 @@ class AppContext:
         self.peer_register = {}
         self.task_queue = Queue()
         self.port = port
+        self.transaction_pool = []
     
     def debug_print(self, str):
         """Print a debug message."""
@@ -59,10 +65,12 @@ class Task:
         self.ctx = ctx
 
 class HandlingRequest(Task):
-    def __init__(self, ctx: AppContext, sock: socket.socket, payload: Any) -> None:
+    def __init__(self, ctx: AppContext, sock: socket.socket, payload: Any, address: Tuple, nonce) -> None:
         super().__init__(ctx)
         self.payload = payload
         self.sock = sock
+        self.address = address
+        self.nonce = nonce
 
     def reply(self, msg: Any):
         """Reply the peer who has sent the request."""
@@ -88,8 +96,32 @@ class HandlingBlockRequest(HandlingRequest):
 
 class HandlingTransactionRequest(HandlingRequest):
     def execute(self):
-        # TODO: process a transaction request
-        pass
+        print(f"Received a transaction from node {self.address[0]}: {self.payload}")
+
+        error = False
+        tx = network.validate_transaction(self.payload, self.nonce)
+
+        if(tx == network.TransactionValidationError.INVALID_JSON):
+            print(f"[TX] Received an invalid transaction, wrong data - {self.payload}")
+            error = True
+        elif(tx == network.TransactionValidationError.INVALID_MESSAGE):
+            print(f"[TX] Received an invalid transaction, wrong message - {self.payload}")
+            error = True
+        elif(tx == network.TransactionValidationError.INVALID_NONCE):
+            print(f"[TX] Received an invalid transaction, wrong nonce - {self.payload}")
+            error = True
+        elif(tx == network.TransactionValidationError.INVALID_SENDER):
+            print(f"[TX] Received an invalid transaction, wrong sender - {self.payload}")
+            error = True
+        elif(tx == network.TransactionValidationError.INVALID_SIGNATURE):
+            print(f"[TX] Received an invalid transaction, wrong signature mssage - {self.payload}")
+            error = True
+        
+        if not error:
+            self.ctx.transaction_pool.append(tx)
+            self.reply({"response": "True"})
+        else:
+            self.reply({"response": "False"})
 
 class HandlingResponse(Task):
     def __init__(self, ctx: AppContext, socket_addr: SocketAddress, callback: ResponseCallback, message: Any) -> None:
@@ -102,10 +134,12 @@ class HandlingResponse(Task):
         self.callback(self.ctx, self.socket_addr, self.message)
 
 class RequestDispatcher(Task):
-    def __init__(self, ctx: AppContext, sock: socket.socket, data: Any):
+    def __init__(self, ctx: AppContext, sock: socket.socket, data: Any, address: Tuple, nonce: int):
         super().__init__(ctx)
         self.data = data
         self.sock = sock
+        self.address = address
+        self.nonce = nonce
 
     def execute(self):
         message_type = self.data["type"]
@@ -113,7 +147,7 @@ class RequestDispatcher(Task):
         if handler_class is None:
             raise NotImplementedError(f"The message type '{message_type}' has no handler")
         # Check the type of the message and invoke the correct worker thread
-        task = handler_class(self.ctx, self.sock, self.data["payload"])
+        task = handler_class(self.ctx, self.sock, self.data["payload"], self.address, self.nonce)
         self.ctx.execute_task(task)
 
 class Worker(threading.Thread):
@@ -191,10 +225,12 @@ class ClientThread(threading.Thread):
 
 # A representative is an agent who is spawned for every incoming master connected.
 class RepresentativeThread(threading.Thread):
-    def __init__(self, conn: socket.socket, ctx: AppContext):
+    def __init__(self, conn: socket.socket, ctx: AppContext, address: Tuple):
         super().__init__()
         self.ctx = ctx
         self.conn = conn
+        self.address = address
+        self.nonce = 0
 
     def run(self):
         try:
@@ -202,7 +238,7 @@ class RepresentativeThread(threading.Thread):
                 # receive a request
                 data = json.loads(recv_prefixed(self.conn).decode())
                 # process the request
-                self.ctx.execute_task(RequestDispatcher(self.ctx, self.conn, data))
+                self.ctx.execute_task(RequestDispatcher(self.ctx, self.conn, data, self.address, self.nonce))
                 time.sleep(0.1)
         except socket.error as e:
             pass
@@ -232,8 +268,9 @@ class ReceptionThread(threading.Thread):
             while True:
                 conn, (client_addr, client_port) = server_socket.accept()
                 self.ctx.debug_print(f"Connected by the client {client_addr}: {client_port}")
-                rep = RepresentativeThread(conn, self.ctx)
+                rep = RepresentativeThread(conn, self.ctx, (client_addr, client_port))
                 rep.start()
+
         except Exception as e:
             self.ctx.debug_print(f"Error during server operation: {e}")
         finally:
@@ -349,11 +386,17 @@ def main():
     peers = read_peers(filepath)
     connect_peers(ctx, peers)
     
+
+    private_key, public_key = generate_key_pair()
+    hex_string = binascii.hexlify(public_key.public_bytes_raw()).decode('ascii')
+    signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 10}))
     # Broadcast a test message
+    
+    payload_ = {"sender": hex_string, "message": "hello", "nonce": 10, "signature": signature}
     """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
     ctx.broadcast_request(Request(
-         type="test", 
-         payload="Hello", 
+         type="transaction", 
+         payload=payload_, 
          callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
          ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
 

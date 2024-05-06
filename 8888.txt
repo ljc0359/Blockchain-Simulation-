@@ -1,16 +1,1 @@
 Listening on 127.0.0.1:8888
-I am trying to connect to peer 127.0.0.1:8888
-I am trying to connect to peer 127.0.0.1:8889
-I am trying to connect to peer 127.0.0.1:8890
-I've connected to the peer 127.0.0.1:8888
-I've connected to the peer 127.0.0.1:8889
-I've connected to the peer 127.0.0.1:8890
-Connected by the client 127.0.0.1: 58409
-Connected by the client 127.0.0.1: 58412
-Connected by the client 127.0.0.1: 58415
-Processing a test request
-Received a response from 127.0.0.1:8890 : Hi
-Received a response from 127.0.0.1:8889 : Hi
-Processing a test request
-Received a response from 127.0.0.1:8888 : Hi
-Processing a test request
