@@ -35,7 +35,7 @@ def recv_prefixed(sock: socket.socket):
 		raise RuntimeError("empty message")
 	if size > 65535 - 2:
 		raise RuntimeError("message too large")
-	return recv_exact(sock, size)
+	return recv_exact(sock, size) 
 
 def send_prefixed(sock: socket.socket, msg: bytes):
 	size = len(msg)

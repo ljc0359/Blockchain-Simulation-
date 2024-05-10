@@ -13,6 +13,7 @@ from typing import Any, Callable, Dict, Tuple, Type
 import network
 from security import generate_key_pair, generate_block_hash, make_signature
 import binascii
+import math
 
 WORKER_COUNT = 8
 
@@ -27,7 +28,10 @@ class AppContext:
     peer_register: PeerRegister
     task_queue: TaskQueue
     transaction_pool: list
-
+    block_chain: list
+    consensus: bool
+    list_of_block_proposal: list
+    clients: list["RepresentativeThread"]
 
     def __init__(self, port):
         self.request_handler_register = {}
@@ -36,7 +40,24 @@ class AppContext:
         self.task_queue = Queue()
         self.port = port
         self.transaction_pool = []
-    
+        self.block_chain = []
+        self.init_genesis_block()
+        self.consensus = False
+        self.list_of_block_proposal = []
+        self.clients = []
+
+    def init_genesis_block(self):
+        genesis_block = {
+            "index": 1,
+            "transactions": [],
+            "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        }
+
+        current_hash = generate_block_hash(json.dumps(genesis_block))
+
+        genesis_block["current_hash"] = current_hash
+        self.block_chain.append(genesis_block)
+
     def debug_print(self, str):
         """Print a debug message."""
         print(str, flush=True)
@@ -55,6 +76,108 @@ class AppContext:
             if not peer.crashed:
                 peer.request_queue.put(request)
 
+    def send_request(self, addr: SocketAddress, request: "Request"):
+        """Send a request to every peer."""
+        if addr not in self.peer_register.keys():
+            print("Current peer members:", list(self.peer_register.keys()))
+            print("Requested socket address", addr)
+            raise KeyError("Peer is not in the register")
+        self.peer_register[addr].request_queue.put(request)
+
+    def consensus_algorithm(self):
+        count = 0
+        client_index = {}
+        for client in self.peer_register.values():
+            client_index[client] = count
+            count += 1
+            client.conn.settimeout(5)
+
+        responses_count = [0] * len(self.clients)
+        def callback(ctx: AppContext, addr, msg: Any):
+            print("Recived Message", msg)
+            for new_block_proposal in msg:
+                if new_block_proposal not in ctx.list_of_block_proposal:
+                    ctx.list_of_block_proposal.append(new_block_proposal)
+            cur_client = ctx.peer_register[addr]
+            responses_count[client_index[cur_client]] += 1
+        
+        ## excluding self in the peer_register
+        f = math.ceil(len(self.peer_register.values()) / 2)
+        for _ in range(f):
+            self.broadcast_request(Request(
+            type="values",
+            payload= len(self.block_chain) + 1,
+            callback = callback))
+            
+            while(not self.check_client()):
+                pass
+            
+        can_decide = responses_count.count(f) >= len(self.clients) - f
+
+        if can_decide:
+            decided_block_proposal = self.decide_block()
+
+            for transaction in decided_block_proposal["transactions"]:
+                self.transaction_pool.remove(transaction)
+            
+            self.block_chain.append(decided_block_proposal)
+            self.debug_print(f"[CONSENSUS] Appended to the blockchain: {decided_block_proposal["current_hash"]}")
+        else:
+            print(responses_count)
+            print(self.list_of_block_proposal)
+            ## consensus algorithm fails
+            self.debug_print("Can't decide on the current block, terminating....")
+
+        for client in self.clients:
+            client.conn.settimeout(None)
+        
+        self.consensus = False
+
+    def decide_block(self):
+        
+        lowest_hash = None
+        block_obj = None
+        self.debug_print("Following is block proposals")
+        self.debug_print(self.list_of_block_proposal)
+        self.debug_print("\n\n")
+        for i, block_proposal in enumerate(self.list_of_block_proposal):
+            self.debug_print(block_proposal)
+            if len(block_proposal["transactions"]) != 0:
+                if lowest_hash == None:
+                    lowest_hash = block_proposal["current_hash"]
+                    block_obj = block_proposal
+                else:
+                    if block_proposal["current_hash"] < lowest_hash:
+                        lowest_hash = block_proposal["current_hash"]
+                        block_obj = block_proposal
+        
+        return block_obj
+
+
+    def check_client(self):
+        flag = True
+        for client in self.peer_register.values():
+            if(not (client.ready or client.crashed)):
+                flag = False
+        
+        return flag
+
+
+"""
+def broadcast(self, ps: list['Process'], f: int):
+		assert(self not in ps)
+		assert(len(ps) >= f)
+		responses_count = [0] * len(ps)
+		for _ in range(f + 1):
+			for idx, p in enumerate(ps):
+				v_p = p.values()
+				if v_p:
+					self.v.update(v_p)
+					responses_count[idx] += 1
+		can_decide = responses_count.count(f + 1) >= len(ps) - f
+		return min(self.v) if can_decide else None
+
+""" 
 class Task:
     ctx: "AppContext"
 
@@ -65,12 +188,13 @@ class Task:
         self.ctx = ctx
 
 class HandlingRequest(Task):
-    def __init__(self, ctx: AppContext, sock: socket.socket, payload: Any, address: Tuple, nonce) -> None:
+    def __init__(self, ctx: AppContext, sock: socket.socket, payload: Any, address: Tuple, nonce, representative: "RepresentativeThread") -> None:
         super().__init__(ctx)
         self.payload = payload
         self.sock = sock
         self.address = address
         self.nonce = nonce
+        self.representative = representative
 
     def reply(self, msg: Any):
         """Reply the peer who has sent the request."""
@@ -88,11 +212,34 @@ class HandlingTestRequest(HandlingRequest):
         # Step2: Send a message back to client
         self.reply({"response": "Hi"})
 
+def generate_block_proposal(ctx: AppContext):
+    block_proposal = {
+        "index": len(ctx.block_chain) + 1,
+        "transactions": [ctx.transaction_pool[0]] if len(ctx.transaction_pool) != 0 else [],
+        "previous_hash": ctx.block_chain[-1]["current_hash"]
+    }
+
+    current_hash = generate_block_hash(json.dumps(block_proposal))
+    block_proposal["current_hash"] = current_hash
+
+    return block_proposal
+
 class HandlingBlockRequest(HandlingRequest):
     def execute(self):
         # TODO: process a block request
-        pass
-        
+        self.ctx.debug_print("Recived Block request")
+        if not self.ctx.consensus:
+            self.ctx.debug_print("Start consensus")
+            self.ctx.list_of_block_proposal = []
+            self.ctx.consensus = True
+            self.ctx.consensus_algorithm()
+            self.ctx.list_of_block_proposal.append(generate_block_proposal(self.ctx))
+            self.reply(self.ctx.list_of_block_proposal)
+            self.ctx.debug_print(f"Reply with my block proposal: {self.ctx.list_of_block_proposal}")
+        else:
+            self.reply(self.ctx.list_of_block_proposal)
+            self.ctx.debug_print(f"Reply with my block proposal: {self.ctx.list_of_block_proposal}")
+
 
 class HandlingTransactionRequest(HandlingRequest):
     def execute(self):
@@ -121,8 +268,21 @@ class HandlingTransactionRequest(HandlingRequest):
             self.ctx.transaction_pool.append(tx)
             print(f"[MEM] Stored transaction in the transaction pool: {tx["signature"]}")
             self.reply({"response": "True"})
+            block_proposal = generate_block_proposal(self.ctx)
+
+            self.ctx.debug_print(f"[PROPOSAL] Created a block proposal: {json.dumps(block_proposal)}")
+            self.consensus = True
+            self.ctx.list_of_block_proposal.append(block_proposal)
+            self.ctx.consensus_algorithm()
         else:
             self.reply({"response": "False"})
+            
+class HandlingCensensus(Task):
+    def __init__(self, ctx: AppContext) -> NoneType:
+        super().__init__(ctx)
+
+    def execute(self):
+        return super().execute()
 
 class HandlingResponse(Task):
     def __init__(self, ctx: AppContext, socket_addr: SocketAddress, callback: ResponseCallback, message: Any) -> None:
@@ -135,12 +295,13 @@ class HandlingResponse(Task):
         self.callback(self.ctx, self.socket_addr, self.message)
 
 class RequestDispatcher(Task):
-    def __init__(self, ctx: AppContext, sock: socket.socket, data: Any, address: Tuple, nonce: int):
+    def __init__(self, ctx: AppContext, sock: socket.socket, data: Any, address: Tuple, nonce: int, client_obj: "RepresentativeThread"):
         super().__init__(ctx)
         self.data = data
         self.sock = sock
         self.address = address
         self.nonce = nonce
+        self.representative = client_obj
 
     def execute(self):
         message_type = self.data["type"]
@@ -148,7 +309,7 @@ class RequestDispatcher(Task):
         if handler_class is None:
             raise NotImplementedError(f"The message type '{message_type}' has no handler")
         # Check the type of the message and invoke the correct worker thread
-        task = handler_class(self.ctx, self.sock, self.data["payload"], self.address, self.nonce)
+        task = handler_class(self.ctx, self.sock, self.data["payload"], self.address, self.nonce, self.representative)
         self.ctx.execute_task(task)
 
 class Worker(threading.Thread):
@@ -182,7 +343,9 @@ class ClientThread(threading.Thread):
         self.port = port
         self.connected = False
         self.crashed = False
+        self.ready = False
         self.request_queue = Queue()
+        self.conn = None
 
     def run(self):
         sock = None
@@ -199,6 +362,7 @@ class ClientThread(threading.Thread):
                         # Print a success message
                         self.ctx.debug_print(f"I've connected to the peer {self.address}:{self.port}")
                         self.connected = True
+                        self.conn = sock
                     except socket.error as e:
                         self.ctx.debug_print(f"Failed to connect the peer {self.address}:{self.port}: {e}. Retrying one more time...")
                         time.sleep(3)  # Wait for a bit before retrying to avoid spamming connection attempts
@@ -219,6 +383,7 @@ class ClientThread(threading.Thread):
                     received_bytes = recv_prefixed(sock)
                     received_data = json.loads(received_bytes.decode())
                     self.ctx.execute_task(HandlingResponse(self.ctx, (self.address, self.port), request.callback, received_data))
+                    self.ready = True
                 except socket.error as e:
                     self.ctx.debug_print(f"Connection error to the peer {self.slave_id}: {e}")
                     self.connected = False
@@ -232,6 +397,8 @@ class RepresentativeThread(threading.Thread):
         self.conn = conn
         self.address = address
         self.nonce = 0
+        self.local_block_proposals = []
+        self.ready = False
 
     def run(self):
         try:
@@ -239,7 +406,7 @@ class RepresentativeThread(threading.Thread):
                 # receive a request
                 data = json.loads(recv_prefixed(self.conn).decode())
                 # process the request
-                self.ctx.execute_task(RequestDispatcher(self.ctx, self.conn, data, self.address, self.nonce))
+                self.ctx.execute_task(RequestDispatcher(self.ctx, self.conn, data, self.address, self.nonce, self))
                 time.sleep(0.1)
         except socket.error as e:
             pass
@@ -270,6 +437,7 @@ class ReceptionThread(threading.Thread):
                 conn, (client_addr, client_port) = server_socket.accept()
                 self.ctx.debug_print(f"Connected by the client {client_addr}: {client_port}")
                 rep = RepresentativeThread(conn, self.ctx, (client_addr, client_port))
+                self.ctx.clients.append(rep)
                 rep.start()
 
         except Exception as e:
@@ -385,6 +553,13 @@ def main():
 
     # Connect all peers
     peers = read_peers(filepath)
+
+    for i, peer in enumerate(peers):
+        if peer[1] == port:
+            peers.remove(peer)
+            break
+    
+    print(peers)
     connect_peers(ctx, peers)
     
 
@@ -395,11 +570,13 @@ def main():
     
     payload_ = {"sender": hex_string, "message": "hello", "nonce": 0, "signature": signature}
     """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
-    ctx.broadcast_request(Request(
-         type="transaction", 
-         payload=payload_, 
-         callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
-         ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
+
+    if port == 8888:
+        ctx.send_request(("127.0.0.1", 8889), Request(
+            type="transaction", 
+            payload=payload_,
+            callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
+            ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
 
 
 if __name__ == "__main__":

@@ -1,1 +1,24 @@
 Listening on 127.0.0.1:8890
+Connected by the client 127.0.0.1: 57341
+[('127.0.0.1', 8888), ('127.0.0.1', 8889)]
+I am trying to connect to peer 127.0.0.1:8888
+I am trying to connect to peer 127.0.0.1:8889
+I've connected to the peer 127.0.0.1:8888
+I've connected to the peer 127.0.0.1:8889
+Connected by the client 127.0.0.1: 57345
+Recived Block request
+Start consensus
+Recived Block request
+Reply with my block proposal: []
+Recived Message [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}]
+Recived Block request
+Following is block proposals
+Recived Message []
+[{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}]
+Reply with my block proposal: [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}]
+
+
+
+{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}
+Recived Block request
+Reply with my block proposal: [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}]
