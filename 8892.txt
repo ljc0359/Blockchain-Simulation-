@@ -1,39 +1,44 @@
-Listening on 127.0.0.1:8890
-[('127.0.0.1', 8888), ('127.0.0.1', 8889), ('127.0.0.1', 8891), ('127.0.0.1', 8892)]
+Listening on 127.0.0.1:8892
+[('127.0.0.1', 8888), ('127.0.0.1', 8889), ('127.0.0.1', 8890), ('127.0.0.1', 8891)]
 I am trying to connect to peer 127.0.0.1:8888
 I've connected to the peer 127.0.0.1:8888
 I am trying to connect to peer 127.0.0.1:8889
 I've connected to the peer 127.0.0.1:8889
-Connected by the client 127.0.0.1: 49280
+I am trying to connect to peer 127.0.0.1:8890
+I've connected to the peer 127.0.0.1:8890
+Connected by the client 127.0.0.1: 49290
+Connected by the client 127.0.0.1: 49291
 I am trying to connect to peer 127.0.0.1:8891
+Connected by the client 127.0.0.1: 49293
 I've connected to the peer 127.0.0.1:8891
-Connected by the client 127.0.0.1: 49283
-I am trying to connect to peer 127.0.0.1:8892
-I've connected to the peer 127.0.0.1:8892
-Connected by the client 127.0.0.1: 49289
-Connected by the client 127.0.0.1: 49292
+Connected by the client 127.0.0.1: 49294
 Recived Block request
 Start consensus
-Recived Block request
 False
-Recived Block request
-Recived Block request
 Just start consensus: Reply with my block proposal: [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}]
 Sending request now!!
 Waiting for response
 In consensus round 0:
 received 1 block requests
 [0, 0, 0, 0]
+Recived Block request
 Recived Message [{'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}, {'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}]
-Recived Message [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
 Recived Message [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}]
-Recived Message [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
+Recived Message [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}]
+Recived Block request
+Recived Message [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}]
+Recived Block request
 In consensus round 0:
 received 1 block requests
 [1, 1, 1, 1]
 In consensus Reply with my block proposal: [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
 In consensus Reply with my block proposal: [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
+In consensus round 0:
+received 3 block requests
+[1, 1, 1, 1]
 In consensus Reply with my block proposal: [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
+Recived Block request
+Recived Block request
 In consensus round 0:
 received 4 block requests
 [1, 1, 1, 1]
@@ -44,19 +49,14 @@ Waiting for response
 In consensus round 1:
 received 0 block requests
 [1, 1, 1, 1]
-Recived Message [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
 Recived Message [{'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}, {'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}]
 Recived Message [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
-Recived Block request
-In consensus round 1:
-received 0 block requests
-[2, 2, 1, 2]
+Recived Message [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
 Recived Message [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
 Recived Block request
-Recived Block request
-Recived Block request
+In consensus Reply with my block proposal: [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
 In consensus round 1:
-received 0 block requests
+received 1 block requests
 [2, 2, 2, 2]
 [2, 2, 2, 2]
 consensus round 1 is finished
@@ -66,33 +66,33 @@ In consensus round 2:
 received 0 block requests
 [2, 2, 2, 2]
 Recived Message [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
-Recived Message [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
-In consensus Reply with my block proposal: [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
+Recived Block request
 Recived Message [{'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}, {'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}]
 Recived Message [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
-Recived Block request
 In consensus Reply with my block proposal: [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
+Recived Message [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
+Recived Block request
 In consensus round 2:
-received 2 block requests
+received 1 block requests
 [3, 3, 3, 3]
 [3, 3, 3, 3]
 consensus round 2 is finished
 Complete my consensus algorithm sucessfully
 Following is block proposals
-In consensus Reply with my block proposal: [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
 [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
-In consensus Reply with my block proposal: [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
 
 
 
-Recived Block request
 {'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}
 {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}
 [CONSENSUS] Appended to the blockchain: d7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5
+In consensus Reply with my block proposal: [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
 Recived Block request
 Start consensus
+In consensus Reply with my block proposal: [{'index': 2, 'transactions': [], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': '879979aed255f0446b9574614cfa58b85dca5c61c001888ff19a92d368b4ffed'}, {'index': 2, 'transactions': [{'sender': '47b38e6e936782eb1b55fa63fe1cdf3eb99a656bbecd2af10e29d48ba166298c', 'message': 'hello', 'nonce': 0, 'signature': '4104b8f50c5dfc8c9526b272ba05bec6d6a796cbb1b1508f067f211822075193e1f2ee0eef8d8805920894b6d27569e42cef49349d08144eb8ccd147b3ec4d01'}], 'previous_hash': '7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061', 'current_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5'}]
 False
-In consensus Reply with my block proposal: [{'index': 3, 'transactions': [], 'previous_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5', 'current_hash': '7540c0bd039aea2087ae57a9db3157afa1e0ac30468cbb0fd984eb5901be9ec1'}]
+In consensus Reply with my block proposal: []
+Recived Block request
 Just start consensus: Reply with my block proposal: [{'index': 3, 'transactions': [], 'previous_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5', 'current_hash': '7540c0bd039aea2087ae57a9db3157afa1e0ac30468cbb0fd984eb5901be9ec1'}]
 Recived Block request
 In consensus Reply with my block proposal: [{'index': 3, 'transactions': [], 'previous_hash': 'd7e8e646123b6d924f014b2031a313d2874360338390b3a7cd0c76b9e8fe28a5', 'current_hash': '7540c0bd039aea2087ae57a9db3157afa1e0ac30468cbb0fd984eb5901be9ec1'}]
