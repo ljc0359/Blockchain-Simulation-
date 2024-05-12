@@ -14,6 +14,10 @@ import network
 from security import generate_key_pair, generate_block_hash, make_signature
 import binascii
 import math
+import io
+
+# Change the default encoding of stdout to UTF-8
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 WORKER_COUNT = 8
 
@@ -58,6 +62,9 @@ class ThreadSafeList:
         with self._lock:
             return len(self._list)
 
+    def reset(self):
+        with self._lock:
+            self._list = []
 
 class AppContext:
     request_handler_register: RequestHandlerRegister
@@ -86,6 +93,8 @@ class AppContext:
         self.block_request_count = 0
         self._block_request_count_lock = threading.Lock()
         self._lock = threading.Lock()  # Initialize the lock
+        self.num_of_crush = 0
+        self.num_of_crush_lock = threading.Lock()
         
     def increment_block_request_count(self):
         with self._block_request_count_lock:
@@ -123,6 +132,7 @@ class AppContext:
     def debug_print(self, str):
         """Print a debug message."""
         print(str, flush=True)
+        pass
 
     def execute_task(self, task: "Task"):
         """Delegate a task to one of the workers."""
@@ -147,63 +157,60 @@ class AppContext:
         self.peer_register[addr].request_queue.put(request)
 
     def consensus_algorithm(self, passive=False):
+        self.debug_print("Start consensus")
         count = 0
         client_index = {}
         for client in self.peer_register.values():
             client_index[client] = count
             count += 1
-            # client.conn.settimeout(5)
+            client.conn.settimeout(5)
 
         responses_count = [0] * len(self.clients)
         resp_lock = threading.Lock()
 
         def callback(ctx: AppContext, addr, msg: Any):
-            print("Recived Message", msg)
-            for new_block_proposal in msg:
-                if new_block_proposal not in ctx.list_of_block_proposal:
-                    ctx.list_of_block_proposal.append(new_block_proposal)
-            cur_client = ctx.peer_register[addr]
-            with resp_lock:
-                responses_count[client_index[cur_client]] += 1
+            try:
+                for new_block_proposal in msg:
+                    if new_block_proposal not in ctx.list_of_block_proposal:
+                        ctx.list_of_block_proposal.append(new_block_proposal)
+                cur_client = ctx.peer_register[addr]
+                with resp_lock:
+                    responses_count[client_index[cur_client]] += 1
+            except Exception as e:
+                self.debug_print(e)
         
         ## excluding self in the peer_register
         f = math.ceil(len(self.peer_register.values()) / 2)
         for i in range(f + 1):
+            self.debug_print(f"Start round {i}")
             if not (i == 0 and passive):
                 self.reset_block_request_count()
             else:
                 self.set_block_request_count(1)
 
-            self.debug_print("Sending request now!!")
             with self.block_chain_lock:   
                 self.broadcast_request(Request(
                 type="values",
                 payload= len(self.block_chain) + 1,
                 callback = callback))
             
-            self.debug_print("Waiting for response")
-            
             while True:
-                self.debug_print(f"In consensus round {i}:")
-                self.debug_print(f"received {self.get_block_request_count()} block requests")
-                self.debug_print(responses_count)
+                with self.num_of_crush_lock:
+                    crush_val = self.num_of_crush
+
                 with resp_lock:
-                    is_resp_met = responses_count.count(i+1) == len(self.peer_register)
-                is_req_met = self.get_block_request_count() >= len(self.peer_register)
+                    is_resp_met = responses_count.count(i+1) == len(self.peer_register) - crush_val
+
+                is_req_met = self.get_block_request_count() >= len(self.peer_register) - crush_val
+                self.debug_print(responses_count)
+                self.debug_print(self.get_block_request_count())
                 if is_resp_met and (i != 0 or is_req_met): break
                 time.sleep(0.1)
-
-            # for client in self.peer_register.values():
-            #     client.ready = False
-
-            self.debug_print(responses_count)
-            self.debug_print(f"consensus round {i} is finished")
 
         with resp_lock:
             can_decide = responses_count.count(f + 1) >= len(self.clients) - f
 
         if can_decide:
-            self.debug_print("Complete my consensus algorithm sucessfully")
             decided_block_proposal = self.decide_block()
 
             if decided_block_proposal == None:
@@ -215,12 +222,12 @@ class AppContext:
             
             with self.block_chain_lock:
                 self.block_chain.append(decided_block_proposal)
-            self.debug_print(f"[CONSENSUS] Appended to the blockchain: {decided_block_proposal["current_hash"]}")
+            print(f"[CONSENSUS] Appended to the blockchain: {decided_block_proposal["current_hash"]}")
+
+
         else:
-            self.debug_print(responses_count)
-            self.debug_print(self.list_of_block_proposal.get_copy())
-            ## consensus algorithm fails
-            self.debug_print("Can't decide on the current block, terminating....")
+            # self.debug_print("Can't decide on the current block, terminating....")
+            pass
 
         for client in self.clients:
             client.conn.settimeout(None)
@@ -228,15 +235,13 @@ class AppContext:
         with self.consensus_lock:
             self.consensus = False
 
+    
+
     def decide_block(self):
         
         lowest_hash = None
         block_obj = None
-        self.debug_print("Following is block proposals")
-        self.debug_print(self.list_of_block_proposal.get_copy())
-        self.debug_print("\n\n")
         for i, block_proposal in enumerate(self.list_of_block_proposal.get_copy()):
-            self.debug_print(block_proposal)
             if len(block_proposal["transactions"]) != 0:
                 if lowest_hash == None:
                     lowest_hash = block_proposal["current_hash"]
@@ -287,7 +292,7 @@ class HandlingTestRequest(HandlingRequest):
     """ATTENTION: THIS CLASS SERVES AS A TEMPLATE FOR HANDLING REQUESTS"""
     def execute(self):
         # Step1: process a test request
-        self.ctx.debug_print("Processing a test request")
+        # self.ctx.debug_print("Processing a test request")
         # Step2: Send a message back to client
         self.reply({"response": "Hi"})
 
@@ -307,40 +312,45 @@ def generate_block_proposal(ctx: AppContext):
 class HandlingBlockRequest(HandlingRequest):
     def execute(self):
         # TODO: process a block request
-        self.ctx.debug_print("Recived Block request")
-
         with self.ctx.consensus_lock:
             consensus_value = self.ctx.consensus
 
-        if not consensus_value:
-            self.ctx.debug_print("Start consensus")
-            self.ctx.list_of_block_proposal = ThreadSafeList()
-            with self.ctx.consensus_lock:
-                self.ctx.debug_print(self.ctx.consensus)
+        try:
+            self.payload = int(self.payload)
+        except:
+            self.ctx.debug_print("Invalid payload")
+            return
 
+        print(f"[BLOCK] Received a block request from node {self.address[0]}: {self.payload}")
+        self.ctx.debug_print(f"consensus value: {consensus_value}")
+        if not consensus_value:
             with self.ctx.consensus_lock:
                 self.ctx.consensus = True
+            self.ctx.list_of_block_proposal = ThreadSafeList()
+
+            
             self.ctx.list_of_block_proposal.append(generate_block_proposal(self.ctx))
             self.reply(self.ctx.list_of_block_proposal.get_copy())
-            self.ctx.debug_print(f"Just start consensus: Reply with my block proposal: {self.ctx.list_of_block_proposal.get_copy()}")
 
             if self.payload > len(self.ctx.block_chain):
                 self.ctx.consensus_algorithm(True)
+            else:
+                with self.ctx.consensus_lock:
+                    self.ctx.consensus = False
             
         else:
             self.reply(self.ctx.list_of_block_proposal.get_copy())
             time.sleep(0.2)
             self.ctx.increment_block_request_count()
-            self.ctx.debug_print(f"In consensus Reply with my block proposal: {self.ctx.list_of_block_proposal.get_copy()}")
 
 
 class HandlingTransactionRequest(HandlingRequest):
     def execute(self):
-        self.ctx.debug_print(f"Received a transaction from node {self.address[0]}: {self.payload}")
+        # self.ctx.debug_print(f"Received a transaction from node {self.address[0]}: {self.payload}")
 
         error = False
         tx = network.validate_transaction(self.payload, self.nonce)
-
+        
         if(tx == network.TransactionValidationError.INVALID_JSON):
             print(f"[TX] Received an invalid transaction, wrong data - {self.payload}")
             error = True
@@ -358,12 +368,14 @@ class HandlingTransactionRequest(HandlingRequest):
             error = True
         
         if not error:
+            self.ctx.debug_print(f"Update nonce value to be {tx['nonce']}")
+            self.representative.nonce = tx['nonce']
             self.ctx.transaction_pool.append(tx)
             print(f"[MEM] Stored transaction in the transaction pool: {tx["signature"]}")
             self.reply({"response": "True"})
             block_proposal = generate_block_proposal(self.ctx)
 
-            self.ctx.debug_print(f"[PROPOSAL] Created a block proposal: {json.dumps(block_proposal)}")
+            print(f"[PROPOSAL] Created a block proposal: {json.dumps(block_proposal)}")
             self.ctx.list_of_block_proposal.append(block_proposal)
 
             with self.ctx.consensus_lock:
@@ -397,19 +409,31 @@ class RequestDispatcher(Task):
         self.representative = client_obj
 
     def execute(self):
-        message_type = self.data["type"]
-        handler_class = self.ctx.request_handler_register.get(message_type)
-        if handler_class is None:
-            raise NotImplementedError(f"The message type '{message_type}' has no handler")
-        # Check the type of the message and invoke the correct worker thread
-        task = handler_class(self.ctx, self.sock, self.data["payload"], self.address, self.nonce, self.representative)
-        self.ctx.execute_task(task)
+        try:
+            # Validate the existence of required data fields
+            if "type" not in self.data or "payload" not in self.data:
+                raise ValueError("Missing required keys in data: 'type' and 'payload' must be present.")
+
+            message_type = self.data["type"]
+            handler_class = self.ctx.request_handler_register.get(message_type)
+            
+            if handler_class is None:
+                raise NotImplementedError(f"The message type '{message_type}' has no handler")
+
+            # Check the type of the message and invoke the correct worker thread
+            task = handler_class(self.ctx, self.sock, self.data["payload"], self.address, self.nonce, self.representative)
+            self.ctx.execute_task(task)
+
+        except Exception as e:
+            self.ctx.debug_print(f"Error handling request: {str(e)}")
+            # Optionally re-raise the exception if you want it to propagate
+            
 
 class Worker(threading.Thread):
     task_queue: TaskQueue
 
     def __init__(self, task_queue: TaskQueue):
-        super().__init__()
+        super().__init__(daemon=True)
         self.task_queue = task_queue
         self.daemon = True
 
@@ -430,7 +454,7 @@ class ClientThread(threading.Thread):
     request_queue: Queue[Request]
 
     def __init__(self, ctx: AppContext, address: str, port: int):
-        super().__init__()
+        super().__init__(daemon=True)
         self.ctx = ctx
         self.address = address
         self.port = port
@@ -460,8 +484,11 @@ class ClientThread(threading.Thread):
                         self.ctx.debug_print(f"Failed to connect the peer {self.address}:{self.port}: {e}. Retrying one more time...")
                         time.sleep(3)  # Wait for a bit before retrying to avoid spamming connection attempts
                 else:
-                    print("I am crashed")
+                    print("The other peer was crashed")
                     self.crashed = True
+                    with self.ctx.num_of_crush_lock:
+                        self.ctx.num_of_crush += 1
+
                     return
             else:
                 try:
@@ -478,18 +505,18 @@ class ClientThread(threading.Thread):
                     self.ctx.execute_task(HandlingResponse(self.ctx, (self.address, self.port), request.callback, received_data))
                     self.ready = True
                 except socket.error as e:
-                    self.ctx.debug_print(f"Connection error to the peer {self.slave_id}: {e}")
+                    self.ctx.debug_print(f"Connection error to the peer ")
                     self.connected = False
             time.sleep(0.1)
 
 # A representative is an agent who is spawned for every incoming master connected.
 class RepresentativeThread(threading.Thread):
     def __init__(self, conn: socket.socket, ctx: AppContext, address: Tuple):
-        super().__init__()
+        super().__init__(daemon=True)
         self.ctx = ctx
         self.conn = conn
         self.address = address
-        self.nonce = 0
+        self.nonce = -1 * float('inf')
         self.local_block_proposals = []
         self.ready = False
 
@@ -510,7 +537,7 @@ class ReceptionThread(threading.Thread):
     port: int
 
     def __init__(self, ctx: AppContext, port: int):
-        super().__init__()
+        super().__init__(daemon=True)
         self.ctx = ctx
         self.port = port
 
@@ -642,7 +669,7 @@ def main():
     reception_thread.start()
 
     # Allow some time to wait for all peers start listening
-    time.sleep(2)
+    time.sleep(3)
 
     # Connect all peers
     peers = read_peers(filepath)
@@ -652,25 +679,31 @@ def main():
             peers.remove(peer)
             break
     
-    print(peers)
     connect_peers(ctx, peers)
     
 
-    private_key, public_key = generate_key_pair()
-    hex_string = binascii.hexlify(public_key.public_bytes_raw()).decode('ascii')
-    signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 0}))
-    # Broadcast a test message
+    # private_key, public_key = generate_key_pair()
+    # hex_string = binascii.hexlify(public_key.public_bytes_raw()).decode('ascii')
+    # signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 0}))
+    # # Broadcast a test message
     
-    payload_ = {"sender": hex_string, "message": "hello", "nonce": 0, "signature": signature}
-    """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
+    # payload_ = {"sender": hex_string, "message": "hello", "nonce": 0, "signature": signature}
+    # """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
 
-    if port == 8888:
-        ctx.send_request(("127.0.0.1", 8889), Request(
-            type="transaction", 
-            payload=payload_,
-            callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
-            ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
-
+    
+    # if port == 8888:
+    #     ctx.send_request(("127.0.0.1", 8889), Request(
+    #         type="transaction", 
+    #         payload=payload_,
+    #         callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
+    #         ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
+    
+    # while(1):
+    #     if port == 8890:
+    #         return
+    #     ctx.debug_print("Running")
+    #     time.sleep(1) 
+    
 
 if __name__ == "__main__":
     main()
