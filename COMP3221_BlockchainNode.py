@@ -537,7 +537,7 @@ class ReceptionThread(threading.Thread):
     port: int
 
     def __init__(self, ctx: AppContext, port: int):
-        super().__init__(daemon=True)
+        super().__init__()
         self.ctx = ctx
         self.port = port
 
