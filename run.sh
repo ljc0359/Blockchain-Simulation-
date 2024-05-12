@@ -1,4 +1,3 @@
-
-python3 COMP3221_BlockchainNode.py 8888 nodes.txt > 8888.txt &
-python3 COMP3221_BlockchainNode.py 8889 nodes.txt > 8889.txt &
-python3 COMP3221_BlockchainNode.py 8890 nodes.txt > 8890.txt &
+for port in {8888..8907}; do
+  python3 COMP3221_BlockchainNode.py $port nodes.txt > $port.txt &
+done
