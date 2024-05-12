@@ -545,7 +545,7 @@ class ReceptionThread(threading.Thread):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
-            server_socket.bind(("127.0.0.1", self.port))
+            server_socket.bind(("0.0.0.0", self.port))
             server_socket.listen()
             self.ctx.debug_print(f"Listening on 127.0.0.1:{self.port}")
         except socket.error as e:
@@ -682,17 +682,18 @@ def main():
     connect_peers(ctx, peers)
     
 
-    # private_key, public_key = generate_key_pair()
-    # hex_string = binascii.hexlify(public_key.public_bytes_raw()).decode('ascii')
-    # signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 0}))
-    # # Broadcast a test message
+    private_key, public_key = generate_key_pair()
+    hex_string = binascii.hexlify(public_key.public_bytes_raw()).decode('ascii')
+    signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 0}))
+    # Broadcast a test message
     
-    # payload_ = {"sender": hex_string, "message": "hello", "nonce": 0, "signature": signature}
-    # """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
+    payload_ = {"sender": hex_string, "message": "hello", "nonce": 0, "signature": signature}
+    """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
 
     
-    # if port == 8888:
-    #     ctx.send_request(("127.0.0.1", 8889), Request(
+    # time.sleep(5)
+    # if port == 8000:
+    #     ctx.send_request(("10.165.243.175", 8001), Request(
     #         type="transaction", 
     #         payload=payload_,
     #         callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
