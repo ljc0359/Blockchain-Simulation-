@@ -167,7 +167,7 @@ class AppContext:
         self.peer_register[addr].request_queue.put(request)
 
     def consensus_algorithm(self, passive=False):
-        # self.debug_print("Start consensus")
+        self.error_print("Start consensus")
         count = 0
         client_index = {}
         for client in self.peer_register.values():
@@ -213,8 +213,8 @@ class AppContext:
                     is_resp_met = responses_count.count(i+1) == len(self.peer_register) - crush_val
 
                 is_req_met = self.get_block_request_count() >= len(self.peer_register) - crush_val
-                # self.debug_print(responses_count)
-                # self.debug_print(self.get_block_request_count())
+                self.error_print(responses_count)
+                self.error_print(self.get_block_request_count())
                 if is_resp_met and (i != 0 or is_req_met): break
                 time.sleep(0.1)
 
@@ -636,17 +636,20 @@ def connect_peers(ctx, peers):
 
 def consensus_check(ctx: AppContext):
     while True:
+        ctx.error_print("consensus_check")
+        ctx.error_print(ctx.peer_register)
+        ctx.error_print("tx len: " + str(len(ctx.transaction_pool)))
         if len(ctx.transaction_pool) > 0:
+            ctx.error_print("C1")
             ctx.consensus_lock.acquire()
+            ctx.error_print("C2")
             if ctx.consensus:
                 ctx.consensus_lock.release()
-                time.sleep(1)
             else:
                 ctx.consensus = True
                 ctx.consensus_lock.release()
                 ctx.consensus_algorithm()
-                time.sleep(1)
-        
+        time.sleep(1)
 
 def main():
     if len(sys.argv) < 3:
@@ -693,8 +696,8 @@ def main():
     # Connect all peers
     peers = read_peers(filepath)
 
-    for i, peer in enumerate(peers):
-        if peer[1] == port:
+    for i, peer in enumerate(peers.copy()):
+        if peer[0] == "127.0.0.1" and peer[1] == port:
             peers.remove(peer)
             break
     
@@ -702,60 +705,41 @@ def main():
     
     threading.Thread(target = consensus_check, args = [ctx]).start()
 
-    # Assuming 'generate_key_pair' is a function that returns a private and public key
-    private_key, public_key = generate_key_pair()
+    # # Assuming 'generate_key_pair' is a function that returns a private and public key
+    # private_key, public_key = generate_key_pair()
 
-    # Assuming 'public_key' is your Ed25519 public key
-    hex_string = binascii.hexlify(
-        public_key.public_bytes(
-            encoding=serialization.Encoding.Raw,
-            format=serialization.PublicFormat.Raw
-        )
-    ).decode('ascii')
-    signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 0}))
-    # Broadcast a test message
-    
-    payload_ = {"sender": hex_string, "message": "hello", "nonce": 0, "signature": signature}
-    """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
+    # # Assuming 'public_key' is your Ed25519 public key
+    # hex_string = binascii.hexlify(
+    #     public_key.public_bytes(
+    #         encoding=serialization.Encoding.Raw,
+    #         format=serialization.PublicFormat.Raw
+    #     )
+    # ).decode('ascii')
 
     
-    time.sleep(3)
-    if port == 8010:
-        ctx.send_request(("127.0.0.1", 8011), Request(
-            type="transaction", 
-            payload=payload_,
-            callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
-            ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
-    
-    signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 1}))
-    # Broadcast a test message
-    
-    payload_ = {"sender": hex_string, "message": "hello", "nonce": 1, "signature": signature}
-    """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
 
+    # signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 0}))
+    # # Broadcast a test message
     
-    time.sleep(3)
-    if port == 8010:
-        ctx.send_request(("127.0.0.1", 8011), Request(
-            type="transaction", 
-            payload=payload_,
-            callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
-            ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
+    # payload_ = {"sender": hex_string, "message": "hello", "nonce": 0, "signature": signature}
+    # """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
+
+    # for i in range(1,4):
+    #     time.sleep(3)
+    #     if port == 8010:
+    #         ctx.send_request(("127.0.0.1", 8011), Request(
+    #             type="transaction", 
+    #             payload=payload_,
+    #             callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
+    #             ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
         
-    signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 2}))
-    # Broadcast a test message
-    
-    payload_ = {"sender": hex_string, "message": "hello", "nonce": 2, "signature": signature}
-    """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
+    #     signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": i}))
+    #     # Broadcast a test message
+        
+    #     payload_ = {"sender": hex_string, "message": "hello", "nonce": i, "signature": signature}
+    #     """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
 
     
-    time.sleep(3)
-    if port == 8010:
-        ctx.send_request(("127.0.0.1", 8011), Request(
-            type="transaction", 
-            payload=payload_,
-            callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
-            ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
 
 if __name__ == "__main__":
     main()
