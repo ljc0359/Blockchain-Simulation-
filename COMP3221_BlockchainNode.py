@@ -232,7 +232,7 @@ class AppContext:
             
             with self.block_chain_lock:
                 self.block_chain.append(decided_block_proposal)
-            self.debug_print(f"[CONSENSUS] Appended to the blockchain: {decided_block_proposal["current_hash"]}")
+            self.debug_print(f"[CONSENSUS] Appended to the blockchain: {decided_block_proposal['current_hash']}")
 
         else:
             # self.debug_print("Can't decide on the current block, terminating....")
@@ -380,7 +380,7 @@ class HandlingTransactionRequest(HandlingRequest):
             # self.ctx.debug_print(f"Update nonce value to be {tx['nonce']}")
             self.representative.nonce = tx['nonce']
             self.ctx.transaction_pool.append(tx)
-            self.ctx.debug_print(f"[MEM] Stored transaction in the transaction pool: {tx["signature"]}")
+            self.ctx.debug_print(f"[MEM] Stored transaction in the transaction pool: {tx['signature']}")
             self.reply({"response": "True"})
             block_proposal = generate_block_proposal(self.ctx)
 
