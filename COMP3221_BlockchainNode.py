@@ -711,8 +711,8 @@ def main():
 
     
     time.sleep(3)
-    if port == 8000:
-        ctx.send_request(("127.0.0.1", 8001), Request(
+    if port == 8010:
+        ctx.send_request(("127.0.0.1", 8011), Request(
             type="transaction", 
             payload=payload_,
             callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
@@ -726,8 +726,8 @@ def main():
 
     
     time.sleep(3)
-    if port == 8000:
-        ctx.send_request(("127.0.0.1", 8001), Request(
+    if port == 8010:
+        ctx.send_request(("127.0.0.1", 8011), Request(
             type="transaction", 
             payload=payload_,
             callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
@@ -741,8 +741,8 @@ def main():
 
     
     time.sleep(3)
-    if port == 8000:
-        ctx.send_request(("127.0.0.1", 8001), Request(
+    if port == 8010:
+        ctx.send_request(("127.0.0.1", 8011), Request(
             type="transaction", 
             payload=payload_,
             callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
