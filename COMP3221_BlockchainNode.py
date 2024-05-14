@@ -19,6 +19,7 @@ import io
 # Change the default encoding of stdout to UTF-8
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
+DISPLAY_ERRORS = False
 WORKER_COUNT = 8
 
 TaskQueue = Queue["Task"]
@@ -75,6 +76,7 @@ class AppContext:
     consensus: bool
     list_of_block_proposal: ThreadSafeList
     clients: ThreadSafeList
+    write_lock: threading.Lock
 
     def __init__(self, port):
         self.request_handler_register = {}
@@ -95,7 +97,13 @@ class AppContext:
         self._lock = threading.Lock()  # Initialize the lock
         self.num_of_crush = 0
         self.num_of_crush_lock = threading.Lock()
+        self.write_lock = threading.Lock()
         
+    def error_print(self, str):
+        if DISPLAY_ERRORS:
+            with self.write_lock:
+                print(str, flush=True)
+
     def increment_block_request_count(self):
         with self._block_request_count_lock:
             self.block_request_count += 1
@@ -131,7 +139,8 @@ class AppContext:
 
     def debug_print(self, str):
         """Print a debug message."""
-        print(str, flush=True)
+        with self.write_lock:
+            print(str, flush=True)
         pass
 
     def execute_task(self, task: "Task"):
@@ -151,13 +160,13 @@ class AppContext:
     def send_request(self, addr: SocketAddress, request: "Request"):
         """Send a request to every peer."""
         if addr not in self.peer_register.keys():
-            print("Current peer members:", list(self.peer_register.keys()))
-            print("Requested socket address", addr)
+            # print("Current peer members:", list(self.peer_register.keys()))
+            # print("Requested socket address", addr)
             raise KeyError("Peer is not in the register")
         self.peer_register[addr].request_queue.put(request)
 
     def consensus_algorithm(self, passive=False):
-        self.debug_print("Start consensus")
+        # self.debug_print("Start consensus")
         count = 0
         client_index = {}
         for client in self.peer_register.values():
@@ -177,12 +186,13 @@ class AppContext:
                 with resp_lock:
                     responses_count[client_index[cur_client]] += 1
             except Exception as e:
-                self.debug_print(e)
+                pass
+                # self.debug_print(e)
         
         ## excluding self in the peer_register
         f = math.ceil(len(self.peer_register.values()) / 2)
         for i in range(f + 1):
-            self.debug_print(f"Start round {i}")
+            # self.debug_print(f"Start round {i}")
             if not (i == 0 and passive):
                 self.reset_block_request_count()
             else:
@@ -202,8 +212,8 @@ class AppContext:
                     is_resp_met = responses_count.count(i+1) == len(self.peer_register) - crush_val
 
                 is_req_met = self.get_block_request_count() >= len(self.peer_register) - crush_val
-                self.debug_print(responses_count)
-                self.debug_print(self.get_block_request_count())
+                # self.debug_print(responses_count)
+                # self.debug_print(self.get_block_request_count())
                 if is_resp_met and (i != 0 or is_req_met): break
                 time.sleep(0.1)
 
@@ -222,8 +232,7 @@ class AppContext:
             
             with self.block_chain_lock:
                 self.block_chain.append(decided_block_proposal)
-            print(f"[CONSENSUS] Appended to the blockchain: {decided_block_proposal["current_hash"]}")
-
+            self.debug_print(f"[CONSENSUS] Appended to the blockchain: {decided_block_proposal["current_hash"]}")
 
         else:
             # self.debug_print("Can't decide on the current block, terminating....")
@@ -318,11 +327,11 @@ class HandlingBlockRequest(HandlingRequest):
         try:
             self.payload = int(self.payload)
         except:
-            self.ctx.debug_print("Invalid payload")
+            self.ctx.error_print("Invalid payload")
             return
 
-        print(f"[BLOCK] Received a block request from node {self.address[0]}: {self.payload}")
-        self.ctx.debug_print(f"consensus value: {consensus_value}")
+        self.ctx.debug_print(f"[BLOCK] Received a block request from node {self.address[0]}: {self.payload}")
+        # self.ctx.debug_print(f"consensus value: {consensus_value}")
         if not consensus_value:
             with self.ctx.consensus_lock:
                 self.ctx.consensus = True
@@ -352,30 +361,30 @@ class HandlingTransactionRequest(HandlingRequest):
         tx = network.validate_transaction(self.payload, self.nonce)
         
         if(tx == network.TransactionValidationError.INVALID_JSON):
-            print(f"[TX] Received an invalid transaction, wrong data - {self.payload}")
+            self.ctx.debug_print(f"[TX] Received an invalid transaction, wrong data - {self.payload}")
             error = True
         elif(tx == network.TransactionValidationError.INVALID_MESSAGE):
-            print(f"[TX] Received an invalid transaction, wrong message - {self.payload}")
+            self.ctx.debug_print(f"[TX] Received an invalid transaction, wrong message - {self.payload}")
             error = True
         elif(tx == network.TransactionValidationError.INVALID_NONCE):
-            print(f"[TX] Received an invalid transaction, wrong nonce - {self.payload}")
+            self.ctx.debug_print(f"[TX] Received an invalid transaction, wrong nonce - {self.payload}")
             error = True
         elif(tx == network.TransactionValidationError.INVALID_SENDER):
-            print(f"[TX] Received an invalid transaction, wrong sender - {self.payload}")
+            self.ctx.debug_print(f"[TX] Received an invalid transaction, wrong sender - {self.payload}")
             error = True
         elif(tx == network.TransactionValidationError.INVALID_SIGNATURE):
-            print(f"[TX] Received an invalid transaction, wrong signature mssage - {self.payload}")
+            self.ctx.debug_print(f"[TX] Received an invalid transaction, wrong signature mssage - {self.payload}")
             error = True
         
         if not error:
-            self.ctx.debug_print(f"Update nonce value to be {tx['nonce']}")
+            # self.ctx.debug_print(f"Update nonce value to be {tx['nonce']}")
             self.representative.nonce = tx['nonce']
             self.ctx.transaction_pool.append(tx)
-            print(f"[MEM] Stored transaction in the transaction pool: {tx["signature"]}")
+            self.ctx.debug_print(f"[MEM] Stored transaction in the transaction pool: {tx["signature"]}")
             self.reply({"response": "True"})
             block_proposal = generate_block_proposal(self.ctx)
 
-            print(f"[PROPOSAL] Created a block proposal: {json.dumps(block_proposal)}")
+            self.ctx.debug_print(f"[PROPOSAL] Created a block proposal: {json.dumps(block_proposal)}")
             self.ctx.list_of_block_proposal.append(block_proposal)
 
             with self.ctx.consensus_lock:
@@ -425,7 +434,7 @@ class RequestDispatcher(Task):
             self.ctx.execute_task(task)
 
         except Exception as e:
-            self.ctx.debug_print(f"Error handling request: {str(e)}")
+            self.ctx.error_print(f"Error handling request: {str(e)}")
             # Optionally re-raise the exception if you want it to propagate
             
 
@@ -473,18 +482,18 @@ class ClientThread(threading.Thread):
                     remaining_chances -= 1
                     try:
                         # Trying to connect to the slave router
-                        self.ctx.debug_print(f"I am trying to connect to peer {self.address}:{self.port}")
+                        self.ctx.error_print(f"I am trying to connect to peer {self.address}:{self.port}")
                         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         sock.connect((self.address, self.port))
                         # Print a success message
-                        self.ctx.debug_print(f"I've connected to the peer {self.address}:{self.port}")
+                        self.ctx.error_print(f"I've connected to the peer {self.address}:{self.port}")
                         self.connected = True
                         self.conn = sock
                     except socket.error as e:
-                        self.ctx.debug_print(f"Failed to connect the peer {self.address}:{self.port}: {e}. Retrying one more time...")
+                        self.ctx.error_print(f"Failed to connect the peer {self.address}:{self.port}: {e}. Retrying one more time...")
                         time.sleep(3)  # Wait for a bit before retrying to avoid spamming connection attempts
                 else:
-                    print("The other peer was crashed")
+                    self.ctx.error_print("The other peer was crashed")
                     self.crashed = True
                     with self.ctx.num_of_crush_lock:
                         self.ctx.num_of_crush += 1
@@ -505,7 +514,7 @@ class ClientThread(threading.Thread):
                     self.ctx.execute_task(HandlingResponse(self.ctx, (self.address, self.port), request.callback, received_data))
                     self.ready = True
                 except socket.error as e:
-                    self.ctx.debug_print(f"Connection error to the peer ")
+                    self.ctx.error_print(f"Connection error to the peer ")
                     self.connected = False
             time.sleep(0.1)
 
@@ -547,23 +556,23 @@ class ReceptionThread(threading.Thread):
         try:
             server_socket.bind(("0.0.0.0", self.port))
             server_socket.listen()
-            self.ctx.debug_print(f"Listening on 127.0.0.1:{self.port}")
+            self.ctx.error_print(f"Listening on 127.0.0.1:{self.port}")
         except socket.error as e:
-            self.ctx.debug_print(f"Failed to listen on 127.0.0.1:{self.port} - {e}")
+            self.ctx.error_print(f"Failed to listen on 127.0.0.1:{self.port} - {e}")
             server_socket.close()
             return  # Early exit on failure to bind or listen
         try:
             while True:
                 conn, (client_addr, client_port) = server_socket.accept()
-                self.ctx.debug_print(f"Connected by the client {client_addr}: {client_port}")
+                self.ctx.error_print(f"Connected by the client {client_addr}: {client_port}")
                 rep = RepresentativeThread(conn, self.ctx, (client_addr, client_port))
                 self.ctx.clients.append(rep)
                 rep.start()
 
         except Exception as e:
-            self.ctx.debug_print(f"Error during server operation: {e}")
+            self.ctx.error_print(f"Error during server operation: {e}")
         finally:
-            self.ctx.debug_print("Server is shutting down")
+            self.ctx.error_print("Server is shutting down")
             server_socket.close()
 
 def recv_exact(sock: socket.socket, msglen):
@@ -616,7 +625,9 @@ def read_peers(filepath):
                     raise ValueError("Port must be between 1 and 65535")
                 peers.append((addr, port))
             except ValueError as e:
-                print(f"Error with peer '{peer}': {e}")
+                # print(f"Error with peer '{peer}': {e}")
+                pass
+
     return peers
 
 def connect_peers(ctx, peers):
@@ -627,29 +638,29 @@ def connect_peers(ctx, peers):
             client_thread.start()
             ctx.peer_register[(addr, port)] = client_thread
         except Exception as e:
-            print(f"Failed to connect to {addr}:{port} - {e}")
+            ctx.error_print(f"Failed to connect to {addr}:{port} - {e}")
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: python COMP3221_BlockchainNode.py <port> <filepath>")
+        # print("Usage: python COMP3221_BlockchainNode.py <port> <filepath>")
         sys.exit(1)
 
     # Check if port number is valid
     try:
         port = int(sys.argv[1])
     except ValueError:
-        print("Error: Port must be an integer.")
+        # print("Error: Port must be an integer.")
         sys.exit(1)
 
     if not 1024 <= port <= 65535:
-        print("Error: Port number must be between 1024 and 65535.")
+        # print("Error: Port number must be between 1024 and 65535.")
         sys.exit(1)
 
     filepath = sys.argv[2]
 
     # Check if the nodes.txt exists and is readable
     if not os.path.isfile(filepath) or not os.access(filepath, os.R_OK):
-        print(f"Error: The file {filepath} does not exist or is not readable.")
+        # print(f"Error: The file {filepath} does not exist or is not readable.")
         sys.exit(1)
 
     ctx = AppContext(port)
@@ -691,19 +702,13 @@ def main():
     """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
 
     
-    # time.sleep(5)
-    # if port == 8000:
-    #     ctx.send_request(("10.165.243.175", 8001), Request(
-    #         type="transaction", 
-    #         payload=payload_,
-    #         callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
-    #         ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
-    
-    # while(1):
-    #     if port == 8890:
-    #         return
-    #     ctx.debug_print("Running")
-    #     time.sleep(1) 
+    time.sleep(5)
+    if port == 8000:
+        ctx.send_request(("127.0.0.1", 8001), Request(
+            type="transaction", 
+            payload=payload_,
+            callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
+            ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
     
 
 if __name__ == "__main__":
