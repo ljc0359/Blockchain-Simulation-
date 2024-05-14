@@ -693,22 +693,22 @@ def main():
     connect_peers(ctx, peers)
     
 
-    private_key, public_key = generate_key_pair()
-    hex_string = binascii.hexlify(public_key.public_bytes_raw()).decode('ascii')
-    signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 0}))
-    # Broadcast a test message
+    # private_key, public_key = generate_key_pair()
+    # hex_string = binascii.hexlify(public_key.public_bytes_raw()).decode('ascii')
+    # signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 0}))
+    # # Broadcast a test message
     
-    payload_ = {"sender": hex_string, "message": "hello", "nonce": 0, "signature": signature}
-    """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
+    # payload_ = {"sender": hex_string, "message": "hello", "nonce": 0, "signature": signature}
+    # """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
 
     
-    time.sleep(5)
-    if port == 8000:
-        ctx.send_request(("127.0.0.1", 8001), Request(
-            type="transaction", 
-            payload=payload_,
-            callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
-            ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
+    # time.sleep(5)
+    # if port == 8000:
+    #     ctx.send_request(("127.0.0.1", 8001), Request(
+    #         type="transaction", 
+    #         payload=payload_,
+    #         callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
+    #         ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
     
 
 if __name__ == "__main__":
