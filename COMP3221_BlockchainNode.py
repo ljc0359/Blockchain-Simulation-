@@ -19,7 +19,7 @@ import io
 # Change the default encoding of stdout to UTF-8
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
-DISPLAY_ERRORS = False
+DISPLAY_ERRORS = True
 WORKER_COUNT = 8
 
 TaskQueue = Queue["Task"]
@@ -387,13 +387,6 @@ class HandlingTransactionRequest(HandlingRequest):
             self.ctx.debug_print(f"[PROPOSAL] Created a block proposal: {json.dumps(block_proposal)}")
             self.ctx.list_of_block_proposal.append(block_proposal)
 
-            with self.ctx.consensus_lock:
-                if self.ctx.consensus:
-                    return
-                else:
-                    self.ctx.consensus = True
-
-            self.ctx.consensus_algorithm()
         else:
             self.reply({"response": "False"})
             
@@ -640,6 +633,20 @@ def connect_peers(ctx, peers):
         except Exception as e:
             ctx.error_print(f"Failed to connect to {addr}:{port} - {e}")
 
+def consensus_check(ctx: AppContext):
+    while True:
+        if len(ctx.transaction_pool) > 0:
+            ctx.consensus_lock.acquire()
+            if ctx.consensus:
+                ctx.consensus_lock.release()
+                time.sleep(1)
+            else:
+                ctx.consensus = True
+                ctx.consensus_lock.release()
+                ctx.consensus_algorithm()
+                time.sleep(1)
+        
+
 def main():
     if len(sys.argv) < 3:
         # print("Usage: python COMP3221_BlockchainNode.py <port> <filepath>")
@@ -692,24 +699,54 @@ def main():
     
     connect_peers(ctx, peers)
     
+    threading.Thread(target = consensus_check, args = [ctx]).start()
 
-    # private_key, public_key = generate_key_pair()
-    # hex_string = binascii.hexlify(public_key.public_bytes_raw()).decode('ascii')
-    # signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 0}))
-    # # Broadcast a test message
+    private_key, public_key = generate_key_pair()
+    hex_string = binascii.hexlify(public_key.public_bytes_raw()).decode('ascii')
+    signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 0}))
+    # Broadcast a test message
     
-    # payload_ = {"sender": hex_string, "message": "hello", "nonce": 0, "signature": signature}
-    # """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
+    payload_ = {"sender": hex_string, "message": "hello", "nonce": 0, "signature": signature}
+    """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
 
     
-    # time.sleep(5)
-    # if port == 8000:
-    #     ctx.send_request(("127.0.0.1", 8001), Request(
-    #         type="transaction", 
-    #         payload=payload_,
-    #         callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
-    #         ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
+    time.sleep(3)
+    if port == 8000:
+        ctx.send_request(("127.0.0.1", 8001), Request(
+            type="transaction", 
+            payload=payload_,
+            callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
+            ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
     
+    signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 1}))
+    # Broadcast a test message
+    
+    payload_ = {"sender": hex_string, "message": "hello", "nonce": 1, "signature": signature}
+    """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
+
+    
+    time.sleep(3)
+    if port == 8000:
+        ctx.send_request(("127.0.0.1", 8001), Request(
+            type="transaction", 
+            payload=payload_,
+            callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
+            ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
+        
+    signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 2}))
+    # Broadcast a test message
+    
+    payload_ = {"sender": hex_string, "message": "hello", "nonce": 2, "signature": signature}
+    """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
+
+    
+    time.sleep(3)
+    if port == 8000:
+        ctx.send_request(("127.0.0.1", 8001), Request(
+            type="transaction", 
+            payload=payload_,
+            callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
+            ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
 
 if __name__ == "__main__":
     main()
