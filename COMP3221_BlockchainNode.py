@@ -15,11 +15,12 @@ from security import generate_key_pair, generate_block_hash, make_signature
 import binascii
 import math
 import io
+from cryptography.hazmat.primitives import serialization
 
 # Change the default encoding of stdout to UTF-8
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
-DISPLAY_ERRORS = True
+DISPLAY_ERRORS = False
 WORKER_COUNT = 8
 
 TaskQueue = Queue["Task"]
@@ -701,8 +702,16 @@ def main():
     
     threading.Thread(target = consensus_check, args = [ctx]).start()
 
+    # Assuming 'generate_key_pair' is a function that returns a private and public key
     private_key, public_key = generate_key_pair()
-    hex_string = binascii.hexlify(public_key.public_bytes_raw()).decode('ascii')
+
+    # Assuming 'public_key' is your Ed25519 public key
+    hex_string = binascii.hexlify(
+        public_key.public_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PublicFormat.Raw
+        )
+    ).decode('ascii')
     signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 0}))
     # Broadcast a test message
     
