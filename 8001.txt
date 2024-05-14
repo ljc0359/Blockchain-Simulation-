@@ -1,0 +1,46 @@
+Listening on 127.0.0.1:8001
+Connected by the client 127.0.0.1: 53041
+I am trying to connect to peer 127.0.0.1:8000
+I've connected to the peer 127.0.0.1:8000
+Connected by the client 127.0.0.1: 53046
+I am trying to connect to peer 127.0.0.1:8002
+I've connected to the peer 127.0.0.1:8002
+I am trying to connect to peer 127.0.0.1:8003
+I've connected to the peer 127.0.0.1:8003
+Connected by the client 127.0.0.1: 53047
+[MEM] Stored transaction in the transaction pool: 09063e9159513d97f4faef8a0eaf16da2fbecc3607988dd27eda1c7f727c18b9c13da0a9f1680a954cccfd9d76170d2a2991cff6137501d44fc87164c134e20e
+[PROPOSAL] Created a block proposal: {"index": 2, "transactions": [{"sender": "30c1b26c2bf1ab30629bcf8dc285f64f1b7172b3624545149284c9612a2198c2", "message": "hello", "nonce": 0, "signature": "09063e9159513d97f4faef8a0eaf16da2fbecc3607988dd27eda1c7f727c18b9c13da0a9f1680a954cccfd9d76170d2a2991cff6137501d44fc87164c134e20e"}], "previous_hash": "7e7f9c24bcb7ec80d647a5780c311660a111f7fdfb612d3d774ce9203c2e8061", "current_hash": "fd81ed97c3fbefb076ce8dbda8caaaccb5f476be4d7d8bd6e9e9d986887757d1"}
+[BLOCK] Received a block request from node 127.0.0.1: 2
+[BLOCK] Received a block request from node 127.0.0.1: 2
+[BLOCK] Received a block request from node 127.0.0.1: 2
+[BLOCK] Received a block request from node 127.0.0.1: 2
+[BLOCK] Received a block request from node 127.0.0.1: 2
+[BLOCK] Received a block request from node 127.0.0.1: 2
+[CONSENSUS] Appended to the blockchain: fd81ed97c3fbefb076ce8dbda8caaaccb5f476be4d7d8bd6e9e9d986887757d1
+[BLOCK] Received a block request from node 127.0.0.1: 2
+[BLOCK] Received a block request from node 127.0.0.1: 2
+[BLOCK] Received a block request from node 127.0.0.1: 2
+[MEM] Stored transaction in the transaction pool: 1ee8029d9fa9caf58f2a38137528899965c889c2cb4696eda897d90617677c6c4a64ad7d523824f80116c94ffb0edff57db5662abcab84bdfafa74c8e5ed0801
+[PROPOSAL] Created a block proposal: {"index": 3, "transactions": [{"sender": "30c1b26c2bf1ab30629bcf8dc285f64f1b7172b3624545149284c9612a2198c2", "message": "hello", "nonce": 1, "signature": "1ee8029d9fa9caf58f2a38137528899965c889c2cb4696eda897d90617677c6c4a64ad7d523824f80116c94ffb0edff57db5662abcab84bdfafa74c8e5ed0801"}], "previous_hash": "fd81ed97c3fbefb076ce8dbda8caaaccb5f476be4d7d8bd6e9e9d986887757d1", "current_hash": "7f9737abe8c3a0d552e5042e6534e0a6f1fd0747f81c3583277e36e272b09447"}
+[BLOCK] Received a block request from node 127.0.0.1: 3
+[BLOCK] Received a block request from node 127.0.0.1: 3
+[BLOCK] Received a block request from node 127.0.0.1: 3
+[BLOCK] Received a block request from node 127.0.0.1: 3
+[BLOCK] Received a block request from node 127.0.0.1: 3
+[BLOCK] Received a block request from node 127.0.0.1: 3
+[BLOCK] Received a block request from node 127.0.0.1: 3
+[CONSENSUS] Appended to the blockchain: 7f9737abe8c3a0d552e5042e6534e0a6f1fd0747f81c3583277e36e272b09447
+[BLOCK] Received a block request from node 127.0.0.1: 3
+[BLOCK] Received a block request from node 127.0.0.1: 3
+[MEM] Stored transaction in the transaction pool: 68e1933a96e2b55a46c50f1fc16dcd0d4c4e28bfc323127664a80ddc410afe9cba3e425382213af3121d6a6d4b73fd6c2e929a67188ec0e52bc2c47b0968d509
+[PROPOSAL] Created a block proposal: {"index": 4, "transactions": [{"sender": "30c1b26c2bf1ab30629bcf8dc285f64f1b7172b3624545149284c9612a2198c2", "message": "hello", "nonce": 2, "signature": "68e1933a96e2b55a46c50f1fc16dcd0d4c4e28bfc323127664a80ddc410afe9cba3e425382213af3121d6a6d4b73fd6c2e929a67188ec0e52bc2c47b0968d509"}], "previous_hash": "7f9737abe8c3a0d552e5042e6534e0a6f1fd0747f81c3583277e36e272b09447", "current_hash": "3a23cb89711765f5607119b097e2ba935d79077379b3ef468108c9c68921ac5e"}
+[BLOCK] Received a block request from node 127.0.0.1: 4
+[BLOCK] Received a block request from node 127.0.0.1: 4
+[BLOCK] Received a block request from node 127.0.0.1: 4
+[BLOCK] Received a block request from node 127.0.0.1: 4
+[BLOCK] Received a block request from node 127.0.0.1: 4
+[BLOCK] Received a block request from node 127.0.0.1: 4
+[CONSENSUS] Appended to the blockchain: 3a23cb89711765f5607119b097e2ba935d79077379b3ef468108c9c68921ac5e
+[BLOCK] Received a block request from node 127.0.0.1: 4
+[BLOCK] Received a block request from node 127.0.0.1: 4
+[BLOCK] Received a block request from node 127.0.0.1: 4
