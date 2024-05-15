@@ -58,10 +58,10 @@ def transaction_bytes(transaction: dict) -> bytes:
 def validate_transaction(transaction: str, nonce) -> dict | TransactionValidationError:
 	tx = transaction
 
-	if not(tx.get('sender') and isinstance(tx['sender'], str) and sender_valid.search(tx['sender'])):
+	if 'sender' not in tx or not(tx.get('sender') and isinstance(tx['sender'], str) and sender_valid.search(tx['sender'])):
 		return TransactionValidationError.INVALID_SENDER
 
-	if not(tx.get('message') and isinstance(tx['message'], str) and len(tx['message']) <= 70 and tx['message'].isalnum()):
+	if 'message' not in tx or not(tx.get('message') and isinstance(tx['message'], str) and len(tx['message']) <= 70 and tx['message'].isalnum()):
 		return TransactionValidationError.INVALID_MESSAGE
 
 	public_key = ed25519.Ed25519PublicKey.from_public_bytes(bytes.fromhex(tx['sender']))
