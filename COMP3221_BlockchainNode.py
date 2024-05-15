@@ -20,7 +20,7 @@ from cryptography.hazmat.primitives import serialization
 # Change the default encoding of stdout to UTF-8
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
-DISPLAY_ERRORS = False
+DISPLAY_ERRORS = True
 WORKER_COUNT = 8
 
 TaskQueue = Queue["Task"]
@@ -127,7 +127,7 @@ class AppContext:
         
     def init_genesis_block(self):
         genesis_block = {
-            "index": 1,
+            "index": 0,
             "transactions": [],
             "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
         }
@@ -344,7 +344,7 @@ class HandlingBlockRequest(HandlingRequest):
             self.ctx.list_of_block_proposal.append(generate_block_proposal(self.ctx))
             self.reply(self.ctx.list_of_block_proposal.get_copy())
 
-            if self.payload > len(self.ctx.block_chain):
+            if self.payload >= len(self.ctx.block_chain):
                 self.ctx.consensus_algorithm(True)
             else:
                 with self.ctx.consensus_lock:
@@ -638,9 +638,9 @@ def connect_peers(ctx, peers):
 
 def consensus_check(ctx: AppContext):
     while True:
-        ctx.error_print("consensus_check")
-        ctx.error_print(ctx.peer_register)
-        ctx.error_print("tx len: " + str(len(ctx.transaction_pool)))
+        # ctx.error_print("consensus_check")
+        # ctx.error_print(ctx.peer_register)
+        # ctx.error_print("tx len: " + str(len(ctx.transaction_pool)))
         if len(ctx.transaction_pool) > 0:
             ctx.error_print("C1")
             ctx.consensus_lock.acquire()
@@ -707,7 +707,7 @@ def main():
     
     threading.Thread(target = consensus_check, args = [ctx]).start()
 
-    # # Assuming 'generate_key_pair' is a function that returns a private and public key
+    # Assuming 'generate_key_pair' is a function that returns a private and public key
     # private_key, public_key = generate_key_pair()
 
     # # Assuming 'public_key' is your Ed25519 public key
@@ -720,12 +720,19 @@ def main():
 
     
 
-    # signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 0}))
-    # # Broadcast a test message
+    # signature = make_signature(private_key, network.transaction_bytes({"sender": "dasda", "message": "hello", "nonce": 0}))
+    # # # Broadcast a test message
     
-    # payload_ = {"sender": hex_string, "message": "hello", "nonce": 0, "signature": signature}
-    # """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
+    # payload_ = {"message": "hello", "nonce": 0, "signature": signature}
+    # # """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
 
+    # if port == 8000:
+    #     ctx.send_request(("127.0.0.1", 8001), Request(
+    #             type="transaction", 
+    #             payload=payload_,
+    #             callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
+    #             ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
+        
     # for i in range(1,4):
     #     time.sleep(3)
     #     if port == 8010:
