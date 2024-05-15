@@ -170,10 +170,12 @@ class AppContext:
         self.error_print("Start consensus")
         count = 0
         client_index = {}
+
         for client in self.peer_register.values():
             client_index[client] = count
             count += 1
-            client.conn.settimeout(5)
+            if client.conn is not None:
+                client.conn.settimeout(5)
 
         responses_count = [0] * len(self.clients)
         resp_lock = threading.Lock()
