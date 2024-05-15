@@ -70,7 +70,7 @@ def validate_transaction(transaction: str, nonce) -> dict | TransactionValidatio
 	except InvalidSignature:
 		return TransactionValidationError.INVALID_SIGNATURE
 	
-	if "nonce" not in tx or not isinstance(nonce, int) or tx["nonce"] <= nonce:
+	if "nonce" not in tx or not isinstance(tx["nonce"], int) or tx["nonce"] <= nonce:
 		return TransactionValidationError.INVALID_NONCE
 	
 	return tx
