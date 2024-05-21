@@ -170,14 +170,14 @@ class AppContext:
         self.error_print("Start consensus")
         count = 0
         client_index = {}
-
         for client in self.peer_register.values():
             client_index[client] = count
             count += 1
-            if client.conn is not None:
+
+            if client.conn:
                 client.conn.settimeout(5)
 
-        responses_count = [0] * len(self.clients)
+        responses_count = [0] * len(self.peer_register)
         resp_lock = threading.Lock()
 
         def callback(ctx: AppContext, addr, msg: Any):
@@ -204,7 +204,7 @@ class AppContext:
             with self.block_chain_lock:   
                 self.broadcast_request(Request(
                 type="values",
-                payload= len(self.block_chain) + 1,
+                payload= len(self.block_chain),
                 callback = callback))
             
             while True:
@@ -221,7 +221,7 @@ class AppContext:
                 time.sleep(0.1)
 
         with resp_lock:
-            can_decide = responses_count.count(f + 1) >= len(self.clients) - f
+            can_decide = responses_count.count(f + 1) >= len(self.peer_register) - f
 
         if can_decide:
             decided_block_proposal = self.decide_block()
@@ -242,7 +242,8 @@ class AppContext:
             pass
 
         for client in self.clients:
-            client.conn.settimeout(None)
+            if client.conn:
+                client.conn.settimeout(None)
         
         with self.consensus_lock:
             self.consensus = False
@@ -311,7 +312,7 @@ class HandlingTestRequest(HandlingRequest):
 def generate_block_proposal(ctx: AppContext):
     with ctx.block_chain_lock:
         block_proposal = {
-            "index": len(ctx.block_chain) + 1,
+            "index": len(ctx.block_chain),
             "transactions": [ctx.transaction_pool.get(0)] if len(ctx.transaction_pool) != 0 else [],
             "previous_hash": ctx.block_chain[-1]["current_hash"]
         }
@@ -638,9 +639,9 @@ def connect_peers(ctx, peers):
 
 def consensus_check(ctx: AppContext):
     while True:
-        # ctx.error_print("consensus_check")
-        # ctx.error_print(ctx.peer_register)
-        # ctx.error_print("tx len: " + str(len(ctx.transaction_pool)))
+        ctx.error_print("consensus_check")
+        ctx.error_print(ctx.peer_register)
+        ctx.error_print("tx len: " + str(len(ctx.transaction_pool)))
         if len(ctx.transaction_pool) > 0:
             ctx.error_print("C1")
             ctx.consensus_lock.acquire()
@@ -707,7 +708,7 @@ def main():
     
     threading.Thread(target = consensus_check, args = [ctx]).start()
 
-    # Assuming 'generate_key_pair' is a function that returns a private and public key
+    # # Assuming 'generate_key_pair' is a function that returns a private and public key
     # private_key, public_key = generate_key_pair()
 
     # # Assuming 'public_key' is your Ed25519 public key
@@ -720,19 +721,12 @@ def main():
 
     
 
-    # signature = make_signature(private_key, network.transaction_bytes({"sender": "dasda", "message": "hello", "nonce": 0}))
-    # # # Broadcast a test message
+    # signature = make_signature(private_key, network.transaction_bytes({"sender": hex_string, "message": "hello", "nonce": 0}))
+    # # Broadcast a test message
     
-    # payload_ = {"message": "hello", "nonce": 0, "signature": signature}
-    # # """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
+    # payload_ = {"sender": hex_string, "message": "hello", "nonce": 0, "signature": signature}
+    # """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
 
-    # if port == 8000:
-    #     ctx.send_request(("127.0.0.1", 8001), Request(
-    #             type="transaction", 
-    #             payload=payload_,
-    #             callback = lambda ctx, addr, msg:  # Callback method is used for handling server's response
-    #             ctx.debug_print(f"Received a response from {addr[0]}:{addr[1]} : " + msg["response"])))
-        
     # for i in range(1,4):
     #     time.sleep(3)
     #     if port == 8010:
@@ -747,8 +741,6 @@ def main():
         
     #     payload_ = {"sender": hex_string, "message": "hello", "nonce": i, "signature": signature}
     #     """ATTENTION: THIS SERVES AS A TEMPLATE FOR BROADCASTING REQUESTS."""
-
-    
 
 if __name__ == "__main__":
     main()
